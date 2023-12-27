@@ -3,6 +3,11 @@
 #include maps\mp\gametypes_zm\_hud_util;
 #include maps\mp\gametypes_zm\_hud_message;
 
+main()
+{
+	replacefunc(maps\mp\zombies\_zm::round_over, ::new_round_over);
+}
+
 init()
 {
 	create_dvar("rampage_max_round", 20 );
@@ -840,4 +845,41 @@ getRequirement()
 	{
 		return 6;
 	}
+}
+
+new_round_over()
+{
+    if ( isdefined( level.noroundnumber ) && level.noroundnumber == 1 )
+        return;
+
+    time = level.zombie_vars["zombie_between_round_time"];
+    players = getplayers();
+
+    for ( player_index = 0; player_index < players.size; player_index++ )
+    {
+        if ( !isdefined( players[player_index].pers["previous_distance_traveled"] ) )
+            players[player_index].pers["previous_distance_traveled"] = 0;
+
+        distancethisround = int( players[player_index].pers["distance_traveled"] - players[player_index].pers["previous_distance_traveled"] );
+        players[player_index].pers["previous_distance_traveled"] = players[player_index].pers["distance_traveled"];
+        players[player_index] incrementplayerstat( "distance_traveled", distancethisround );
+
+        if ( players[player_index].pers["team"] != "spectator" )
+        {
+            zonename = players[player_index] get_current_zone();
+
+            if ( isdefined( zonename ) )
+                players[player_index] recordzombiezone( "endingZone", zonename );
+        }
+    }
+
+    recordzombieroundend();
+    if (level.ragestarted == 1)
+    {
+
+    }
+    else
+    {
+    	wait( time );
+    }
 }
