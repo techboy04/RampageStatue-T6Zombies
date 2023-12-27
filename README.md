@@ -2,7 +2,7 @@
 Inspired by the Rampage Inducer and the concept from [ps9s Rampage Inducer mod](https://forum.plutonium.pw/topic/24383/release-zombies-rampage-inducer?_=1665077522772) (Their download link was broken at the time of making this mod)
 I decided to try making one myself.
 
-Simply interact near the statues that are located near the spawn locations. All players MUST be near the statue in order for it to activate.
+Simply interact near the statues that are located near the spawn locations.
 When the statue is activated zombies will run and be given zero respawn delay for a specified amount of rounds (Customizable but default is Round 20)
 
 ## Installation
