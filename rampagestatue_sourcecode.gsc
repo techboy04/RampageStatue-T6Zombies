@@ -98,7 +98,7 @@ spawnInducer()
 {
 	level.ragestarted = 0;
 	rampageTrigger = spawn( "trigger_radius", (level.effectlocation), 1, 50, 50 );
-	rampageTrigger setHintString("^7Press ^3&&1 ^7to activate Rampage Statue (All players need to be nearby)\nAll zombies will run for a certain amount of rounds");
+	rampageTrigger setHintString("^7Press ^3&&1 ^7to activate Rampage Statuen\nAll zombies will run for a certain amount of rounds");
 	rampageTrigger setcursorhint( "HINT_NOICON" );
 	rageInducerModel = spawn( "script_model", (level.effectlocation));
 	rageInducerModel setmodel ("defaultactor");
@@ -114,20 +114,26 @@ spawnInducer()
 				if (level.rampagevoting == 0)
 				{
 					level.rampagevoting = 1;
+					level.exfilplayervotes = 0;
 					
-					if(level.players.size == 1)
+					level.exfilplayervotes += 1;
+					i.rampagevoted = 1;
+					if (level.exfilplayervotes >= level.players.size)
 					{
 						level.votingsuccess = 1;
+						level notify ("voting_finished");
 					}
 					
-					else
+					level thread rampageVoteTimer();
+					
+					foreach ( player in get_players() )
 					{
-						level thread rampageVoteTimer();
-						foreach ( player in get_players() )
-						{
-							player thread showrampagevoting(i);
-							player thread checkRampageVotingInput();
-						}
+						player thread showrampagevoting(i);
+						player thread checkRampageVotingInput();
+					}
+
+					if (level.votingsuccess != 1)
+					{
 						level waittill_any ("voting_finished","voting_expired");
 					}
 					if (level.votingsuccess == 1)
@@ -295,7 +301,7 @@ showrampageVoting(activator)
 	while(1)
 	{
 		voting_text setValue (level.votingtimer);
-		votesLeft = level.votingrequirement - level.exfilplayervotes;
+		votesLeft = level.players.size - level.exfilplayervotes;
 //		votesLeft = getRequirement();
 		voting_votes setValue (votesLeft);
 		if (self.rampagevoted == 0)
@@ -322,13 +328,14 @@ checkRampageVotingInput()
 {
 	level endon ("voting_finished");
 	level endon ("voting_expired");
-	while((level.rampagevoting == 1) && (self.rampagevoted == 0) && (level.rampagevoteexec != self))
+	
+	while(level.rampagevoting == 1 && self.rampagevoted == 0)
 	{
-		if(self actionslotfourbuttonpressed())
+		if(self actionslotfourbuttonpressed() || (isDefined(self.bot)))
 		{
 			level.exfilplayervotes += 1;
 			self.rampagevoted = 1;
-			if (level.exfilplayervotes >= level.votingrequirement)
+			if (level.exfilplayervotes >= level.players.size)
 			{
 				level.votingsuccess = 1;
 				level notify ("voting_finished");
@@ -350,7 +357,7 @@ rampageVoteTimer()
 		{
 			level.votingrequirement = 0;
 			level.rampageplayervotes = 0;
-			foreach (player in getPlayers())
+			foreach (player in get_players())
 				player.rampagevoted = 0;
 			level.rampagevoting = 0;
 			level.votingsuccess = 0;
