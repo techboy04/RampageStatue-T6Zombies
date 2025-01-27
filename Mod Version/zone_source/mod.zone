@@ -1,0 +1,8 @@
+>game,T6
+>name,mod
+>type,fastfile
+
+material,hud_icon_rampage
+
+script,scripts/zm/main.gsc
+soundbank,mod.all
